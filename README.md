@@ -139,3 +139,12 @@ extra-volumes:
    path: /var/run/docker.sock
 ```
 
+
+Commands
+
+```bash
+      sonobuoy run -p domino-checker.yaml --wait
+      resultsfile=$(sonobuoy retrieve)
+      sonobuoy results $resultsfile --plugin domino
+      sonobuoy delete --wait
+```
