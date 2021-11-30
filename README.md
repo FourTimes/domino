@@ -51,3 +51,19 @@ Node pool requirements
         k8s.io/cluster-autoscaler/node-template/label/domino/build-node: true
         k8s.io/cluster-autoscaler/enabled: true #Optional for autodiscovery
         k8s.io/cluster-autoscaler/{{ cluster_name }}: owned #Optional for autodiscovery
+
+##### Optional GPU compute pool
+
+      Boot Disk: 400GB
+      Recommended Min Nodes: 0
+      Max Nodes: Set as necessary to meet demand and resourcing needs
+      Recommended min Spec: 8 CPU / 16GB / One or more Nvidia GPU Device
+      Nodes must be pre-configured with appropriate Nvidia driver, Nvidia-docker2 and set the default docker runtime to nvidia. For example, EKS GPU optimized AMI.
+      Labels: 
+            dominodatalab.com/node-pool: default-gpu, 
+            nvidia.com/gpu: true
+      Tags:
+            k8s.io/cluster-autoscaler/node-template/label/dominodatalab.com/node-pool: default-gpu
+            kubernetes.io/cluster/{{ cluster_name }}: owned
+            k8s.io/cluster-autoscaler/enabled: true #Optional for autodiscovery
+            k8s.io/cluster-autoscaler/{{ cluster_name }}: owned #Optional for autodiscovery
