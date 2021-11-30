@@ -148,3 +148,7 @@ Commands
       sonobuoy results $resultsfile --plugin domino
       sonobuoy delete --wait
 ```
+
+output
+
+![image](https://user-images.githubusercontent.com/57703276/144083009-39629b58-2c66-4d6d-bcb9-250f253db4f2.png)
