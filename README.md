@@ -67,3 +67,11 @@ Node pool requirements
             kubernetes.io/cluster/{{ cluster_name }}: owned
             k8s.io/cluster-autoscaler/enabled: true #Optional for autodiscovery
             k8s.io/cluster-autoscaler/{{ cluster_name }}: owned #Optional for autodiscovery
+
+cluster verification process
+
+```bahs
+ wget https://github.com/vmware-tanzu/sonobuoy/releases/download/v0.55.1/sonobuoy_0.55.1_linux_amd64.tar.gz
+ tar -xvzf sonobuoy_0.55.1_linux_amd64.tar.gz
+ sudo mv sonobuoy /usr/local/bin/
+```
