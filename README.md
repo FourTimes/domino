@@ -68,10 +68,74 @@ Node pool requirements
             k8s.io/cluster-autoscaler/enabled: true #Optional for autodiscovery
             k8s.io/cluster-autoscaler/{{ cluster_name }}: owned #Optional for autodiscovery
 
-cluster verification process
+##### cluster verification process
 
-```bahs
+      You should perform the following steps from a workstation with kubectl admin access to the target cluster.
+
+##### Install Sonobuoy binaries
+
+      If the cluster is running Kubernetes 1.13, install sonobuoy v0.15.4.
+      If the cluster is running Kubernetes 1.14, install sonobuoy v0.16.2
+      If the cluster is running Kubernetes 1.15 or above, install the latest sonobuoy release
+
+```bash
  wget https://github.com/vmware-tanzu/sonobuoy/releases/download/v0.55.1/sonobuoy_0.55.1_linux_amd64.tar.gz
  tar -xvzf sonobuoy_0.55.1_linux_amd64.tar.gz
  sudo mv sonobuoy /usr/local/bin/
 ```
+
+
+Run the following command to determine the Kubernetes version for your cluster:
+
+      kubectl version
+
+Set a KUBECONFIG environment variable to a path to a kubeconfig file with admin access to the target cluster.
+
+      export KUBECONFIG=~/.kube/config
+      
+Create a `domino-checker.yaml` configuration file with the following contents
+
+```yml
+# domino-checker.yaml
+sonobuoy-config:
+ driver: DaemonSet
+ plugin-name: domino
+ result-format: junit
+ skip-cleanup: true
+spec:
+ env:
+ - name: DOCKER_API_VERSION
+   value: '1.38'
+ - name: NODE_NAME
+   valueFrom:
+     fieldRef:
+       fieldPath: spec.nodeName
+ - name: POD_NAME
+   valueFrom:
+     fieldRef:
+       fieldPath: metadata.name
+ - name: POD_NAMESPACE
+   valueFrom:
+     fieldRef:
+       fieldPath: metadata.namespace
+ - name: RESULTS_DIR
+   value: /tmp/results
+ image: quay.io/domino/k8s-validator:latest
+ imagePullPolicy: Always
+ name: domino
+ securityContext:
+   privileged: false
+ volumeMounts:
+ - mountPath: /tmp/results
+   name: results
+   readOnly: false
+ - mountPath: /var/run/docker.sock
+   name: docker-mnt
+   readOnly: false
+
+extra-volumes:
+- name: docker-mnt
+  hostPath:
+   path: /var/run/docker.sock
+```
+
