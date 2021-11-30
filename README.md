@@ -149,6 +149,64 @@ Commands
       sonobuoy delete --wait
 ```
 
+```yaml
+---
+# cluster.yml
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: domino
+  region: us-east-2
+nodeGroups:
+  - name: domino-platform
+    instanceType: m5.2xlarge
+    minSize: 3
+    maxSize: 3
+    desiredCapacity: 3
+    volumeSize: 128
+    availabilityZones: ["us-east-2a"]
+    labels:
+      "dominodatalab.com/node-pool": "platform"
+    tags:
+      "k8s.io/cluster-autoscaler/enabled": "true" 
+      "k8s.io/cluster-autoscaler/domino": "owned" 
+  - name: domino-default
+    instanceType: m5.2xlarge
+    minSize: 0
+    maxSize: 10
+    desiredCapacity: 1
+    volumeSize: 400
+    availabilityZones: ["us-east-2a"]
+    labels:
+      "dominodatalab.com/node-pool": "default"
+      "domino/build-node": "true"
+    tags:
+      "k8s.io/cluster-autoscaler/node-template/label/dominodatalab.com/node-pool": "default"
+      "k8s.io/cluster-autoscaler/node-template/label/domino/build-node": "true"
+      "k8s.io/cluster-autoscaler/enabled": "true" 
+      "k8s.io/cluster-autoscaler/domino": "owned" 
+    preBootstrapCommands:
+      - "cp /etc/docker/daemon.json /etc/docker/daemon_backup.json"
+      - "echo -e '.bridge=\"docker0\" | .\"live-restore\"=false' >  /etc/docker/jq_script"
+      - "jq -f /etc/docker/jq_script /etc/docker/daemon_backup.json | tee /etc/docker/daemon.json"
+      - "systemctl restart docker"
+  - name: domino-gpu
+    instanceType: p2.8xlarge
+    minSize: 0
+    maxSize: 5
+    volumeSize: 400
+    availabilityZones: ["us-east-2a"]
+    ami:
+      ami-014b0ee6a978b6ca5
+    labels:
+      "dominodatalab.com/node-pool": "default-gpu"
+      "nvidia.com/gpu": "true"
+    tags:
+      "k8s.io/cluster-autoscaler/node-template/label/dominodatalab.com/node-pool": "default-gpu"
+      "k8s.io/cluster-autoscaler/enabled": "true" 
+      "k8s.io/cluster-autoscaler/domino": "owned" 
+availabilityZones: ["us-east-2a", "us-east-2b", "us-east-2c"]
+```
 output
 
 `1`
